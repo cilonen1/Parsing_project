@@ -24,7 +24,7 @@ def first_coef(driver, pi, col_n, row):
     Returns
     ---------
     row: float
-        opening odds for the team
+        opening odds for the choosing team
     """
     book = driver.find_elements_by_class_name('table-main.detail-odds.sortable')
     opup =  book[0].find_elements_by_xpath(f'//*[@id="odds-data-table"]/div[{row}]/table/tbody/tr[{pi}]/td[{col_n}]')[0]
