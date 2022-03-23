@@ -30,6 +30,13 @@ def count_row(driver, init_row, pi, all_hd, url):
     return row
 
 def collect_data(league,year):# league format brazil/serie-a
+    """
+    Download data first/last odds from oddsportal.com for total and handicap
+    Parameters:
+    league: name of league in format brazil/serie-a
+    year: year in format 2021 
+    return: dataframe with games and odds
+    """
     driver = webdriver.Chrome(ChromeDriverManager().install())
     driver.get(f'https://www.oddsportal.com/soccer/{league}-{year}/results/1')
     page = driver.find_element_by_id('pagination').text
