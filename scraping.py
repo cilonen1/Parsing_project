@@ -89,7 +89,7 @@ def get_odds(game, driver, hd, all_hd, link, url, sportsbook):
         else:
             return np.zeros(4)
 
-def collect_data(league, year, low_board=1.68, high_board=2.25):
+def collect_data(league, year, driver, low_board=1.68, high_board=2.25):
     """
     Download data first/last odds from oddsportal.com for total and handicap
 
@@ -101,13 +101,13 @@ def collect_data(league, year, low_board=1.68, high_board=2.25):
         year in format '2021'
     sportsbook: str
         name of sportsbook
+    driver: webDriver
 
     Returns
     ---------
     odds_df:
         dataframe with game's results and odds
     """
-    driver = webdriver.Chrome(ChromeDriverManager().install())
     driver.get(f'https://www.oddsportal.com/soccer/{league}-{year}/results/1')
     page = driver.find_element_by_id('pagination').text
     pages = max([int(i) for i in re.findall('\d+', page)[0]]) + 1
@@ -122,8 +122,8 @@ def collect_data(league, year, low_board=1.68, high_board=2.25):
     sportsbook = 'Pinnacle'
     hd_range = ['-2.50', '-2.00', '-1.50', '-1.00', '-0.50', '0.00', '0.50', '1.00', '1.50']
     hd_bins = np.array([1.05, 1.25, 1.45, 1.7, 1.85, 2.25, 2.8, 3.8, 5.5])
-    func = lambda x: x-2 if x >1 else x
-    for game in matches_id[:4]:
+    func = lambda x: x - 2 if x > 1 else x - 1
+    for game in matches_id:
         #This part helps to get rid of scrapping ALL hd, we take k1 and put to bin
         url = game
         time.sleep(0.25)
@@ -160,8 +160,8 @@ def collect_data(league, year, low_board=1.68, high_board=2.25):
             if low_board < first1 < high_board: 
                 if min([first1,first2]) > min([out1, out2]):
                     out_hd, out1, out2, oul1, oul2 = hd, first1, first2, float(last1), float(last2)
-                elif first2 <= low_board:
-                    break
+            elif first1 <= low_board:
+                break
         print('equal',out_hd, out1, out2, oul1, oul2)        
                             
         url = game + '#over-under;2;'
@@ -184,8 +184,8 @@ def collect_data(league, year, low_board=1.68, high_board=2.25):
             if low_board < first1 < high_board: 
                 if min([first1,first2]) > min([tot1, tot2]):
                     out_tot, tot1, tot2, tol1, tol2 = tot, first1, first2, float(last1), float(last2)
-                elif first2 <= low_board:
-                    break
+            elif first2 <= low_board:
+                break
         print('equal_tot',out_tot, tot2, tot1, tol2, tol1)
 
         season_odd.append((date, teams.split('-')[0].rstrip(' '), teams.split('-')[1].lstrip(' '), goal1, goal2, 
